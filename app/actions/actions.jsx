@@ -48,6 +48,7 @@ export var doLogin = (user, password) => {
                 username: res.data.email,
                 token: res.headers['x-auth']
               }));
+              localStorage.setItem('jwt-token', res.headers['x-auth']);
               hashHistory.push('/');
               break;
             case 401:
@@ -67,6 +68,7 @@ export var doLogout = (token) => {
           switch (res.status) {
             case 200:
               dispatch(logout());
+              localStorage.clearItem('jwt-token');
               hashHistory.push('/');
               break;
             case 401:
@@ -89,7 +91,6 @@ export var doRegister = (user, password, phone) => {
           phone
         }, {validateStatus: (status) => (status === 200 || status === 400) })
           .then((res) => {
-          console.log(JSON.stringify(res, undefined, 2));
           switch (res.status) {
             case 200:
               dispatch(clearErrorMessage());
@@ -97,25 +98,53 @@ export var doRegister = (user, password, phone) => {
                 username: res.data.email,
                 token: res.headers['x-auth']
               }));
+              localStorage.setItem('jwt-token', res.headers['x-auth']);
               hashHistory.push('/');
               break;
             case 400:
               var message = '';
-              var e = res.data.errors;
-              if (e.phone) {
-                message += e.phone.message;
-              }
-              if (e.email) {
-                message += e.email.message;
-              }
-              if (e.password) {
-                message += e.password.message;
-              }
+              if (res.data.errors){
+                var e = res.data.errors;
+                if (e.phone) {
+                  message += e.phone.message;
+                }
+                if (e.email) {
+                  message += e.email.message;
+                }
+                if (e.password) {
+                  message += e.password.message;
+                }
+              } else { message = res.data};
               dispatch(setErrorMessage(message));
               break;
             default:
                 dispatch(setErrorMessage('An error occurred'));
           }
-        }).catch((e) => dispatch(setErrorMessage(e)));
+        }).catch((e) => {
+          console.log(e);
+          dispatch(setErrorMessage(e))
+        });
     };
+}
+
+export var loadToken = (token) => {
+  return function (dispatch) {
+    axios.get('http://localhost:3000/api/v1/user/', {
+          headers: {'x-auth': token}
+        }).then((res) => {
+          switch (res.status) {
+            case 200:
+              dispatch(clearErrorMessage());
+              dispatch(setUser({
+                username: res.data.email,
+                token: token
+              }));
+              hashHistory.push('/');
+              break;
+            default:
+                localStorage.removeItem('jwt-token');
+          }
+        }).catch((e) => localStorage.removeItem('jwt-token'));
+  }
+
 }

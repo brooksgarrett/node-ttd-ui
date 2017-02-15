@@ -6,6 +6,7 @@ var {Provider} = require('react-redux');
 import TTDApp from './components/ttdapp';
 import Login from './components/login';
 import Register from './components/register';
+import * as actions from './actions/actions';
 
 var store = require('./store/configureStore').configure();
 
@@ -15,6 +16,11 @@ require('style!css!sass!ApplicationStyles');
 store.subscribe(() => {
     var state = store.getState();
 });
+
+// Check if we have a token
+if (localStorage.getItem('jwt-token')) {
+    store.dispatch(actions.loadToken(localStorage.getItem('jwt-token')));
+}
 
 $(document).foundation();
 

@@ -23,7 +23,6 @@ export class Register extends React.Component {
                     e.preventDefault();
                     var {username, password, passwordConfirm, phone} = this.refs;
                     if (username.value.length === 0 || password.value.length === 0) {
-                        console.log('ERR: You must enter a username and password');
                         dispatch(actions.setErrorMessage('You must enter a username and password'));
                     } else if (password.value !== passwordConfirm.value) {
                         dispatch(actions.setErrorMessage('Password and Confirm Password must match'));

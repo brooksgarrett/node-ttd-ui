@@ -23,7 +23,6 @@ export class Login extends React.Component {
                     e.preventDefault();
                     var {username, password} = this.refs;
                     if (username.value.length === 0 || password.value.length === 0) {
-                        console.log('ERR: You must enter a username and password');
                         dispatch(actions.setErrorMessage('You must enter a username and password'));
                     } else {
                         

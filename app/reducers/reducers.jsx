@@ -18,7 +18,7 @@ export var userReducer = (state = {
     case 'SET_USER':
       return {
         username: action.user.username,
-        token: aciton.user.token,
+        token: action.user.token,
         loggedIn: true
       };
     case 'LOGOUT':
