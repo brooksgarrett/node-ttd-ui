@@ -43,13 +43,7 @@ export var doLogin = (user, password) => {
         }, {validateStatus: (status) => (status === 200 || status === 401) }).then((res) => {
           switch (res.status) {
             case 200:
-              dispatch(clearErrorMessage());
-              dispatch(setUser({
-                username: res.data.email,
-                token: res.headers['x-auth']
-              }));
-              localStorage.setItem('jwt-token', res.headers['x-auth']);
-              hashHistory.push('/');
+              dispatch(startSession(res.data.email, res.headers['x-auth'], '/manage'));
               break;
             case 401:
                 dispatch(setErrorMessage('Bad username or password'));
@@ -85,6 +79,20 @@ export var doLogout = (token) => {
     };
 }
 
+export var startSession = (user, token, redirect = undefined) => {
+  return function (dispatch) {
+    dispatch(clearErrorMessage());
+    dispatch(setUser({
+      username: user,
+      token: token
+    }));
+    localStorage.setItem('jwt-token', token);
+    if (redirect) {
+      hashHistory.push(redirect);
+    }
+  }
+}
+
 export var doRegister = (user, password, phone) => {
     // We return a function instead of an action object
     return (dispatch) => {
@@ -96,13 +104,7 @@ export var doRegister = (user, password, phone) => {
           .then((res) => {
           switch (res.status) {
             case 200:
-              dispatch(clearErrorMessage());
-              dispatch(setUser({
-                username: res.data.email,
-                token: res.headers['x-auth']
-              }));
-              localStorage.setItem('jwt-token', res.headers['x-auth']);
-              hashHistory.push('/');
+              dispatch(startSession(res.data.username, res.headers['x-auth'], '/manage'));
               break;
             case 400:
               var message = '';
@@ -137,11 +139,7 @@ export var loadToken = (token) => {
         }).then((res) => {
           switch (res.status) {
             case 200:
-              dispatch(clearErrorMessage());
-              dispatch(setUser({
-                username: res.data.email,
-                token: token
-              }));
+              dispatch(startSession(res.data.username, res.headers['x-auth']));
               break;
             default:
                 localStorage.removeItem('jwt-token');

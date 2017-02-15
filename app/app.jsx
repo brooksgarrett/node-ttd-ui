@@ -6,6 +6,7 @@ var {Provider} = require('react-redux');
 import TTDApp from './components/ttdapp';
 import Login from './components/login';
 import Register from './components/register';
+import Manage from './components/manage';
 import * as actions from './actions/actions';
 
 var store = require('./store/configureStore').configure();
@@ -30,6 +31,7 @@ ReactDOM.render(
             <Route path="/" component={TTDApp}>
                 <Route path="/login" component={Login}/>
                 <Route path="/register" component={Register} />
+                <Route path="/manage" component={Manage} />
             </Route>
         </Router>
     </Provider>,
