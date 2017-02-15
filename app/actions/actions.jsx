@@ -40,7 +40,7 @@ export var doLogin = (user, password) => {
         axios.post('http://localhost:3000/api/v1/user/login', {
           email: user,
           password
-        }).then((res) => {
+        }, {validateStatus: (status) => (status === 200 || status === 401) }).then((res) => {
           switch (res.status) {
             case 200:
               dispatch(clearErrorMessage());
@@ -57,7 +57,10 @@ export var doLogin = (user, password) => {
               default:
                 dispatch(setErrorMessage('An error occurred'));
           }
-        }).catch((e) => dispatch(setErrorMessage(e)));
+        }).catch((e) => {
+          console.log(e);
+          dispatch(setErrorMessage(e))
+        });
     };
 }
 
@@ -129,7 +132,7 @@ export var doRegister = (user, password, phone) => {
 
 export var loadToken = (token) => {
   return function (dispatch) {
-    axios.get('http://localhost:3000/api/v1/user/', {
+    axios.get('http://localhost:3000/api/v1/user/me', {
           headers: {'x-auth': token}
         }).then((res) => {
           switch (res.status) {
@@ -139,7 +142,6 @@ export var loadToken = (token) => {
                 username: res.data.email,
                 token: token
               }));
-              hashHistory.push('/');
               break;
             default:
                 localStorage.removeItem('jwt-token');
