@@ -14,8 +14,8 @@ class Nav extends React.Component {
             <li className="menu-text">TTDApp</li>
                 <li><Link to="/manage" activeClassName="active-link">Manage</Link></li>
                 <li><Link to="/dispatches" activeClassName="active-link">Dispatches</Link></li>
-                <li><Link to="/" activeClassName="active-link" onClick={() => {
-                    dispatch(actions.logout());
+                <li><Link activeClassName="active-link" onClick={() => {
+                    dispatch(actions.doLogout(token));
                 }}>Logout</Link></li>
             </ul>
         )
@@ -59,7 +59,8 @@ class Nav extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   return {
     loggedIn: state.user.loggedIn,
-    username: state.user.username
+    username: state.user.username,
+    token: state.user.token
   }
 }
 
