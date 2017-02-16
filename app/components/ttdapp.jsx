@@ -9,10 +9,9 @@ export class TTDApp extends React.Component {
   }
   render() {
     return (
-      <div className="column small-centered small-11 medium-6 large-5">
-          <h1>TTDApp</h1>
+      <div>
           <Nav />
-          <div className="container">
+          <div className="columns medium-6 large-4 small-centered">
             {this.props.children}
           </div>
       </div>

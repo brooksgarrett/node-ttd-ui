@@ -83,12 +83,84 @@ export var startSession = (user, token, redirect = undefined) => {
   return function (dispatch) {
     dispatch(clearErrorMessage());
     dispatch(setUser({
-      username: user,
-      token: token
+      username: user.email,
+      token: token,
+      subscriptions: user.subscriptions
     }));
     localStorage.setItem('jwt-token', token);
+    dispatch(fetchTonesets(token, user.subscriptions));
     if (redirect) {
       hashHistory.push(redirect);
+    }
+  }
+}
+
+export var fetchTonesets = (token, subscriptions) => {
+  return function (dispatch) {
+    axios.get('http://localhost:3000/api/v1/toneset/',{
+      headers: {'x-auth': token}
+    }).then((res) => {
+      var tonesets = res.data.tonesets.map((toneset) => {
+         var subs = subscriptions.filter((tonesetS) => tonesetS._toneset === toneset._id);
+         toneset.subscribed = (subs.length > 0);
+         return toneset;
+        });
+      dispatch(setTonesets(tonesets));
+    }).catch((e) => {
+      console.log(e);
+      dispatch(setErrorMessage(e))
+    });
+  }
+}
+
+export var setTonesets = (tonesets) => {
+  return {
+    type: 'SET_TONESETS',
+    tonesets
+  }
+};
+
+export var toggleToneset = (tonesetID) => {
+  return {
+    type: 'TOGGLE_TONESET',
+    tonesetID
+  }
+};
+
+export var toggleSubscribe = (token, tonesetID, subscribed) => {
+  return function (dispatch) {
+    if (subscribed) {
+      axios.delete(`http://localhost:3000/api/v1/user/subscribe/${tonesetID}`, 
+        {headers: {'x-auth': token}}
+        ).then((res) => {
+          switch (res.status) {
+            case 200:
+              dispatch(toggleToneset(tonesetID));
+              break;
+            case 401:
+                dispatch(setErrorMessage('You are not logged in'));
+                hashHistory.push('/login');
+              break;
+              default:
+                dispatch(setErrorMessage('An error occurred'));
+          }
+        }).catch((e) => dispatch(setErrorMessage(e)));
+    } else {
+       axios.post(`http://localhost:3000/api/v1/user/subscribe/${tonesetID}`, {},
+        {headers: {'x-auth': token}}
+        ).then((res) => {
+          switch (res.status) {
+            case 200:
+              dispatch(toggleToneset(tonesetID));
+              break;
+            case 401:
+                dispatch(setErrorMessage('You are not logged in'));
+                hashHistory.push('/login');
+              break;
+              default:
+                dispatch(setErrorMessage('An error occurred'));
+          }
+        }).catch((e) => dispatch(setErrorMessage(e)));
     }
   }
 }
@@ -104,7 +176,7 @@ export var doRegister = (user, password, phone) => {
           .then((res) => {
           switch (res.status) {
             case 200:
-              dispatch(startSession(res.data.username, res.headers['x-auth'], '/manage'));
+              dispatch(startSession(res.data, res.headers['x-auth'], '/manage'));
               break;
             case 400:
               var message = '';
@@ -139,7 +211,7 @@ export var loadToken = (token) => {
         }).then((res) => {
           switch (res.status) {
             case 200:
-              dispatch(startSession(res.data.username, res.headers['x-auth']));
+              dispatch(startSession(res.data, token));
               break;
             default:
                 localStorage.removeItem('jwt-token');

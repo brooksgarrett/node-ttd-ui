@@ -10,34 +10,49 @@ class Nav extends React.Component {
     userNavBar () { 
         var {dispatch, username} = this.props;
         return (
-        <div>
-            <ul>
-                <li>{username}</li>
-                <li><Link to="/manage">Manage</Link></li>
-                <li><Link to="/dispatches">Dispatches</Link></li>
-                <li><Link to="/" onClick={() => {
+            <ul className="menu">
+            <li className="menu-text">TTDApp</li>
+                <li><Link to="/manage" activeClassName="active-link">Manage</Link></li>
+                <li><Link to="/dispatches" activeClassName="active-link">Dispatches</Link></li>
+                <li><Link to="/" activeClassName="active-link" onClick={() => {
                     dispatch(actions.logout());
                 }}>Logout</Link></li>
             </ul>
-        </div>
         )
     }
     anonNavBar () {
         return (
-        <div>
-            <ul>
-                <li><Link to="/login">Login</Link></li>
-                <li><Link to="/register">Register</Link></li>
+            <ul className="menu">
+                <li className="menu-text">TTDApp</li>
+                <li><Link to="/login" activeClassName="active-link">Login</Link></li>
+                <li><Link to="/register" activeClassName="active-link">Register</Link></li>
             </ul>
-        </div>
         )
     }
     render () {
+        var navLinks = null;
         if (this.props.loggedIn) {
-            return this.userNavBar();
+            navLinks = this.userNavBar();
         } else {
-            return this.anonNavBar();
+            navLinks = this.anonNavBar();
         }
+
+        return (
+        <div className="top-bar">
+            <div className="top-bar-left">
+                {this.props.loggedIn ? (
+                    this.userNavBar()
+                ) : (
+                    this.anonNavBar()
+                )}
+            </div>
+            <div className="top-bar-right">
+                <ul className="menu">
+                <li className="menu-text">Created by <a href="https://github.com/brooksgarrett/">Brooks Garrett</a></li>
+                </ul>
+            </div>
+        </div>
+        )
     }
 }
 

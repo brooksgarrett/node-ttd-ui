@@ -12,20 +12,30 @@ export var exampleReducer = (state = 'world', action) => {
 export var userReducer = (state = {
   username: null,
   token: null,
-  loggedIn: false
+  loggedIn: false,
+  subscriptions: []
 }, action) => {
   switch (action.type){
     case 'SET_USER':
       return {
         username: action.user.username,
         token: action.user.token,
-        loggedIn: true
+        loggedIn: true,
+        subscriptions: action.user.subscriptions
+      };
+    case 'SET_SUBSCRIPTIONS':
+      return {
+        subscriptions: action.subscriptions,
+        username: state.user.username,
+        token: state.user.token,
+        loggedIn: state.user.loggedIn
       };
     case 'LOGOUT':
       return {
         username: null,
         token: null,
-        loggedIn: false
+        loggedIn: false,
+        subscriptions: []
       };
     default:
       return state;
@@ -42,3 +52,19 @@ export var errorMessageReducer = (state = '', action) => {
       return state;
   };
 };
+
+export var tonesetReducer = (state = [], action) => {
+  switch (action.type){
+    case 'SET_TONESETS':
+      return action.tonesets;
+    case 'TOGGLE_TONESET':
+      return state.map((toneset) => {
+        if (toneset._id === action.tonesetID) {
+          toneset.subscribed = !toneset.subscribed;
+        } 
+        return toneset;
+      })
+    default:
+      return state
+  }
+}
