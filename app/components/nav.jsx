@@ -8,7 +8,7 @@ class Nav extends React.Component {
         super(props);
     }
     userNavBar () { 
-        var {dispatch, username} = this.props;
+        var {dispatch, username, token} = this.props;
         return (
             <ul className="menu">
             <li className="menu-text">TTDApp</li>

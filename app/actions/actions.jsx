@@ -43,7 +43,7 @@ export var doLogin = (user, password) => {
         }, {validateStatus: (status) => (status === 200 || status === 401) }).then((res) => {
           switch (res.status) {
             case 200:
-              dispatch(startSession(res.data.email, res.headers['x-auth'], '/manage'));
+              dispatch(startSession(res.data, res.headers['x-auth'], '/manage'));
               break;
             case 401:
                 dispatch(setErrorMessage('Bad username or password'));
@@ -60,12 +60,13 @@ export var doLogin = (user, password) => {
 
 export var doLogout = (token) => {
   return (dispatch) => {
-        axios.delete('http://localhost:3000/api/v1/user/logout')
-          .then((res) => {
+        axios.delete('http://localhost:3000/api/v1/user/logout',
+        {headers: {'x-auth': token}}
+        ).then((res) => {
           switch (res.status) {
             case 200:
               dispatch(logout());
-              localStorage.clearItem('jwt-token');
+              localStorage.removeItem('jwt-token');
               hashHistory.push('/');
               break;
             case 401:
